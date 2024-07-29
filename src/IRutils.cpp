@@ -169,6 +169,7 @@ bool hasACState(const decode_type_t protocol) {
     // This is kept sorted by name
     case AMCOR:
     case ARGO:
+    case BLUESTARHEAVY:
     case BOSCH144:
     case CARRIER_AC84:
     case CARRIER_AC128:
@@ -701,6 +702,15 @@ namespace irutils {
           default:                                return kUnknownStr;
         }
         break;
+      case decode_type_t::TOSHIBA_AC:
+        switch (model) {
+          case toshiba_ac_remote_model_t::kToshibaGenericRemote_A:
+            return kToshibaGenericRemoteAStr;
+          case toshiba_ac_remote_model_t::kToshibaGenericRemote_B:
+            return kToshibaGenericRemoteBStr;
+          default:
+            return kUnknownStr;
+        }
       default: return kUnknownStr;
     }
   }
