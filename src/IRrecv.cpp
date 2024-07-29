@@ -608,106 +608,106 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
   for (uint16_t offset = kStartOffset;
        offset <= (max_skip * 2) + kStartOffset;
        offset += 2) {
-#if DECODE_AIWA_RC_T501
-    DPRINTLN("Attempting Aiwa RC T501 decode");
-    // Try decodeAiwaRCT501() before decodeSanyoLC7461() & decodeNEC()
-    // because the protocols are similar. This protocol is more specific than
-    // those ones, so should go before them.
-    if (decodeAiwaRCT501(results, offset)) return true;
-#endif
-#if DECODE_SANYO
-    DPRINTLN("Attempting Sanyo LC7461 decode");
-    // Try decodeSanyoLC7461() before decodeNEC() because the protocols are
-    // similar in timings & structure, but the Sanyo one is much longer than the
-    // NEC protocol (42 vs 32 bits) so this one should be tried first to try to
-    // reduce false detection as a NEC packet.
-    if (decodeSanyoLC7461(results, offset)) return true;
-#endif
-#if DECODE_CARRIER_AC
-    DPRINTLN("Attempting Carrier AC decode");
-    // Try decodeCarrierAC() before decodeNEC() because the protocols are
-    // similar in timings & structure, but the Carrier one is much longer than
-    // the NEC protocol (3x32 bits vs 1x32 bits) so this one should be tried
-    // first to try to reduce false detection as a NEC packet.
-    if (decodeCarrierAC(results, offset)) return true;
-#endif
-#if DECODE_PIONEER
-    DPRINTLN("Attempting Pioneer decode");
-    // Try decodePioneer() before decodeNEC() because the protocols are
-    // similar in timings & structure, but the Pioneer one is much longer than
-    // the NEC protocol (2x32 bits vs 1x32 bits) so this one should be tried
-    // first to try to reduce false detection as a NEC packet.
-    if (decodePioneer(results, offset)) return true;
-#endif
-#if DECODE_EPSON
-  DPRINTLN("Attempting Epson decode");
-  // Try decodeEpson() before decodeNEC() because the protocols are
-  // similar in timings & structure, but the Epson one is much longer than the
-  // NEC protocol (3x32 identical bits vs 1x32 bits) so this one should be tried
-  // first to try to reduce false detection as a NEC packet.
-  if (decodeEpson(results, offset)) return true;
-#endif
+// #if DECODE_AIWA_RC_T501
+//     DPRINTLN("Attempting Aiwa RC T501 decode");
+//     // Try decodeAiwaRCT501() before decodeSanyoLC7461() & decodeNEC()
+//     // because the protocols are similar. This protocol is more specific than
+//     // those ones, so should go before them.
+//     if (decodeAiwaRCT501(results, offset)) return true;
+// #endif
+// #if DECODE_SANYO
+//     DPRINTLN("Attempting Sanyo LC7461 decode");
+//     // Try decodeSanyoLC7461() before decodeNEC() because the protocols are
+//     // similar in timings & structure, but the Sanyo one is much longer than the
+//     // NEC protocol (42 vs 32 bits) so this one should be tried first to try to
+//     // reduce false detection as a NEC packet.
+//     if (decodeSanyoLC7461(results, offset)) return true;
+// #endif
+// #if DECODE_CARRIER_AC
+//     DPRINTLN("Attempting Carrier AC decode");
+//     // Try decodeCarrierAC() before decodeNEC() because the protocols are
+//     // similar in timings & structure, but the Carrier one is much longer than
+//     // the NEC protocol (3x32 bits vs 1x32 bits) so this one should be tried
+//     // first to try to reduce false detection as a NEC packet.
+//     if (decodeCarrierAC(results, offset)) return true;
+// #endif
+// #if DECODE_PIONEER
+//     DPRINTLN("Attempting Pioneer decode");
+//     // Try decodePioneer() before decodeNEC() because the protocols are
+//     // similar in timings & structure, but the Pioneer one is much longer than
+//     // the NEC protocol (2x32 bits vs 1x32 bits) so this one should be tried
+//     // first to try to reduce false detection as a NEC packet.
+//     if (decodePioneer(results, offset)) return true;
+// #endif
+// #if DECODE_EPSON
+//   DPRINTLN("Attempting Epson decode");
+//   // Try decodeEpson() before decodeNEC() because the protocols are
+//   // similar in timings & structure, but the Epson one is much longer than the
+//   // NEC protocol (3x32 identical bits vs 1x32 bits) so this one should be tried
+//   // first to try to reduce false detection as a NEC packet.
+//   if (decodeEpson(results, offset)) return true;
+// #endif
 #if DECODE_NEC
     DPRINTLN("Attempting NEC decode");
     if (decodeNEC(results, offset)) return true;
 #endif
-#if DECODE_MILESTAG2
-    DPRINTLN("Attempting MilesTag2 decode");
-  // Try decodeMilestag2() before decodeSony() because the protocols are
-  // similar in timings & structure, but the Miles one differs in nbits
-  // so this one should be tried first to try to reduce false detection
-    if (decodeMilestag2(results, offset, kMilesTag2MsgBits) ||
-        decodeMilestag2(results, offset, kMilesTag2ShotBits)) return true;
-#endif
-#if DECODE_SONY
-    DPRINTLN("Attempting Sony decode");
-    if (decodeSony(results, offset)) return true;
-#endif
-#if DECODE_MITSUBISHI
-    DPRINTLN("Attempting Mitsubishi decode");
-    if (decodeMitsubishi(results, offset)) return true;
-#endif
-#if DECODE_MITSUBISHI_AC
-    DPRINTLN("Attempting Mitsubishi AC decode");
-    if (decodeMitsubishiAC(results, offset)) return true;
-#endif
-#if DECODE_MITSUBISHI2
-    DPRINTLN("Attempting Mitsubishi2 decode");
-    if (decodeMitsubishi2(results, offset)) return true;
-#endif
-#if DECODE_RC5
-    DPRINTLN("Attempting RC5 decode");
-    if (decodeRC5(results, offset)) return true;
-#endif
-#if DECODE_RC6
-    DPRINTLN("Attempting RC6 decode");
-    if (decodeRC6(results, offset)) return true;
-#endif
-#if DECODE_RCMM
-    DPRINTLN("Attempting RC-MM decode");
-    if (decodeRCMM(results, offset)) return true;
-#endif
-#if DECODE_FUJITSU_AC
-    // Fujitsu A/C needs to precede Panasonic and Denon as it has a short
-    // message which looks exactly the same as a Panasonic/Denon message.
-    DPRINTLN("Attempting Fujitsu A/C decode");
-    if (decodeFujitsuAC(results, offset)) return true;
-#endif
-#if DECODE_DENON
-    // Denon needs to precede Panasonic as it is a special case of Panasonic.
-    DPRINTLN("Attempting Denon decode");
-    if (decodeDenon(results, offset, kDenon48Bits) ||
-        decodeDenon(results, offset, kDenonBits) ||
-        decodeDenon(results, offset, kDenonLegacyBits))
-      return true;
-#endif
-#if DECODE_PANASONIC
-    DPRINTLN("Attempting Panasonic (48-bit) decode");
-    if (decodePanasonic(results, offset)) return true;
-    DPRINTLN("Attempting Panasonic (40-bit) decode");
-    if (decodePanasonic(results, offset, kPanasonic40Bits, true,
-                        kPanasonic40Manufacturer)) return true;
-#endif  // DECODE_PANASONIC
+// #if DECODE_MILESTAG2
+//     DPRINTLN("Attempting MilesTag2 decode");
+//   // Try decodeMilestag2() before decodeSony() because the protocols are
+//   // similar in timings & structure, but the Miles one differs in nbits
+//   // so this one should be tried first to try to reduce false detection
+//     if (decodeMilestag2(results, offset, kMilesTag2MsgBits) ||
+//         decodeMilestag2(results, offset, kMilesTag2ShotBits)) return true;
+// #endif
+// #if DECODE_SONY
+//     DPRINTLN("Attempting Sony decode");
+//     if (decodeSony(results, offset)) return true;
+// #endif
+// #if DECODE_MITSUBISHI
+//     DPRINTLN("Attempting Mitsubishi decode");
+//     if (decodeMitsubishi(results, offset)) return true;
+// #endif
+// #if DECODE_MITSUBISHI_AC
+//     DPRINTLN("Attempting Mitsubishi AC decode");
+//     if (decodeMitsubishiAC(results, offset)) return true;
+// #endif
+// #if DECODE_MITSUBISHI2
+//     DPRINTLN("Attempting Mitsubishi2 decode");
+//     if (decodeMitsubishi2(results, offset)) return true;
+// #endif
+// #if DECODE_RC5
+//     DPRINTLN("Attempting RC5 decode");
+//     if (decodeRC5(results, offset)) return true;
+// #endif
+// #if DECODE_RC6
+//     DPRINTLN("Attempting RC6 decode");
+//     if (decodeRC6(results, offset)) return true;
+// #endif
+// #if DECODE_RCMM
+//     DPRINTLN("Attempting RC-MM decode");
+//     if (decodeRCMM(results, offset)) return true;
+// #endif
+// #if DECODE_FUJITSU_AC
+//     // Fujitsu A/C needs to precede Panasonic and Denon as it has a short
+//     // message which looks exactly the same as a Panasonic/Denon message.
+//     DPRINTLN("Attempting Fujitsu A/C decode");
+//     if (decodeFujitsuAC(results, offset)) return true;
+// #endif
+// #if DECODE_DENON
+//     // Denon needs to precede Panasonic as it is a special case of Panasonic.
+//     DPRINTLN("Attempting Denon decode");
+//     if (decodeDenon(results, offset, kDenon48Bits) ||
+//         decodeDenon(results, offset, kDenonBits) ||
+//         decodeDenon(results, offset, kDenonLegacyBits))
+//       return true;
+// #endif
+// #if DECODE_PANASONIC
+//     DPRINTLN("Attempting Panasonic (48-bit) decode");
+//     if (decodePanasonic(results, offset)) return true;
+//     DPRINTLN("Attempting Panasonic (40-bit) decode");
+//     if (decodePanasonic(results, offset, kPanasonic40Bits, true,
+//                         kPanasonic40Manufacturer)) return true;
+// #endif  // DECODE_PANASONIC
 #if DECODE_LG
     DPRINTLN("Attempting LG (28-bit) decode");
     if (decodeLG(results, offset, kLgBits, true)) return true;
@@ -715,83 +715,83 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
     // LG32 should be tried before Samsung
     if (decodeLG(results, offset, kLg32Bits, true)) return true;
 #endif
-#if DECODE_GICABLE
-    // Note: Needs to happen before JVC decode, because it looks similar except
-    //       with a required NEC-like repeat code.
-    DPRINTLN("Attempting GICable decode");
-    if (decodeGICable(results, offset)) return true;
-#endif
-#if DECODE_JVC
-    DPRINTLN("Attempting JVC decode");
-    if (decodeJVC(results, offset)) return true;
-#endif
-#if DECODE_SAMSUNG
-    DPRINTLN("Attempting SAMSUNG decode");
-    if (decodeSAMSUNG(results, offset)) return true;
-#endif
-#if DECODE_SAMSUNG36
-    DPRINTLN("Attempting Samsung36 decode");
-    if (decodeSamsung36(results, offset)) return true;
-#endif
-#if DECODE_WHYNTER
-    DPRINTLN("Attempting Whynter decode");
-    if (decodeWhynter(results, offset)) return true;
-#endif
-#if DECODE_DISH
-    DPRINTLN("Attempting DISH decode");
-    if (decodeDISH(results, offset)) return true;
-#endif
-#if DECODE_SHARP
-    DPRINTLN("Attempting Sharp decode");
-    if (decodeSharp(results, offset)) return true;
-#endif
-#if DECODE_BOSCH144
-    DPRINTLN("Attempting Bosch 144-bit decode");
-    // Bosch is similar to Coolix, so it must be attempted before decodeCOOLIX.
-    if (decodeBosch144(results, offset)) return true;
-#endif  // DECODE_BOSCH144
-#if DECODE_COOLIX
-    DPRINTLN("Attempting Coolix 24-bit decode");
-    if (decodeCOOLIX(results, offset)) return true;
-#endif  // DECODE_COOLIX
-#if DECODE_NIKAI
-    DPRINTLN("Attempting Nikai decode");
-    if (decodeNikai(results, offset)) return true;
-#endif
-#if DECODE_KELVINATOR
-    // Kelvinator based-devices use a similar code to Gree ones, to avoid false
-    // matches this needs to happen before decodeGree().
-    DPRINTLN("Attempting Kelvinator decode");
-    if (decodeKelvinator(results, offset)) return true;
-#endif
-#if DECODE_DAIKIN
-    DPRINTLN("Attempting Daikin decode");
-    if (decodeDaikin(results, offset)) return true;
-#endif
-#if DECODE_DAIKIN2
-    DPRINTLN("Attempting Daikin2 decode");
-    if (decodeDaikin2(results, offset)) return true;
-#endif
-#if DECODE_DAIKIN216
-    DPRINTLN("Attempting Daikin216 decode");
-    if (decodeDaikin216(results, offset)) return true;
-#endif
-#if DECODE_TOSHIBA_AC
-    DPRINTLN("Attempting Toshiba AC 72bit decode");
-    if (decodeToshibaAC(results, offset)) return true;
-    DPRINTLN("Attempting Toshiba AC 80bit decode");
-    if (decodeToshibaAC(results, offset, kToshibaACBitsLong)) return true;
-    DPRINTLN("Attempting Toshiba AC 56bit decode");
-    if (decodeToshibaAC(results, offset, kToshibaACBitsShort)) return true;
-#endif
-#if DECODE_MIDEA
-    DPRINTLN("Attempting Midea decode");
-    if (decodeMidea(results, offset)) return true;
-#endif
-#if DECODE_MAGIQUEST
-    DPRINTLN("Attempting Magiquest decode");
-    if (decodeMagiQuest(results, offset)) return true;
-#endif
+// #if DECODE_GICABLE
+//     // Note: Needs to happen before JVC decode, because it looks similar except
+//     //       with a required NEC-like repeat code.
+//     DPRINTLN("Attempting GICable decode");
+//     if (decodeGICable(results, offset)) return true;
+// #endif
+// #if DECODE_JVC
+//     DPRINTLN("Attempting JVC decode");
+//     if (decodeJVC(results, offset)) return true;
+// #endif
+// #if DECODE_SAMSUNG
+//     DPRINTLN("Attempting SAMSUNG decode");
+//     if (decodeSAMSUNG(results, offset)) return true;
+// #endif
+// #if DECODE_SAMSUNG36
+//     DPRINTLN("Attempting Samsung36 decode");
+//     if (decodeSamsung36(results, offset)) return true;
+// #endif
+// #if DECODE_WHYNTER
+//     DPRINTLN("Attempting Whynter decode");
+//     if (decodeWhynter(results, offset)) return true;
+// #endif
+// #if DECODE_DISH
+//     DPRINTLN("Attempting DISH decode");
+//     if (decodeDISH(results, offset)) return true;
+// #endif
+// #if DECODE_SHARP
+//     DPRINTLN("Attempting Sharp decode");
+//     if (decodeSharp(results, offset)) return true;
+// #endif
+// #if DECODE_BOSCH144
+//     DPRINTLN("Attempting Bosch 144-bit decode");
+//     // Bosch is similar to Coolix, so it must be attempted before decodeCOOLIX.
+//     if (decodeBosch144(results, offset)) return true;
+// #endif  // DECODE_BOSCH144
+// #if DECODE_COOLIX
+//     DPRINTLN("Attempting Coolix 24-bit decode");
+//     if (decodeCOOLIX(results, offset)) return true;
+// #endif  // DECODE_COOLIX
+// #if DECODE_NIKAI
+//     DPRINTLN("Attempting Nikai decode");
+//     if (decodeNikai(results, offset)) return true;
+// #endif
+// #if DECODE_KELVINATOR
+//     // Kelvinator based-devices use a similar code to Gree ones, to avoid false
+//     // matches this needs to happen before decodeGree().
+//     DPRINTLN("Attempting Kelvinator decode");
+//     if (decodeKelvinator(results, offset)) return true;
+// #endif
+// #if DECODE_DAIKIN
+//     DPRINTLN("Attempting Daikin decode");
+//     if (decodeDaikin(results, offset)) return true;
+// #endif
+// #if DECODE_DAIKIN2
+//     DPRINTLN("Attempting Daikin2 decode");
+//     if (decodeDaikin2(results, offset)) return true;
+// #endif
+// #if DECODE_DAIKIN216
+//     DPRINTLN("Attempting Daikin216 decode");
+//     if (decodeDaikin216(results, offset)) return true;
+// #endif
+// #if DECODE_TOSHIBA_AC
+//     DPRINTLN("Attempting Toshiba AC 72bit decode");
+//     if (decodeToshibaAC(results, offset)) return true;
+//     DPRINTLN("Attempting Toshiba AC 80bit decode");
+//     if (decodeToshibaAC(results, offset, kToshibaACBitsLong)) return true;
+//     DPRINTLN("Attempting Toshiba AC 56bit decode");
+//     if (decodeToshibaAC(results, offset, kToshibaACBitsShort)) return true;
+// #endif
+// #if DECODE_MIDEA
+//     DPRINTLN("Attempting Midea decode");
+//     if (decodeMidea(results, offset)) return true;
+// #endif
+// #if DECODE_MAGIQUEST
+//     DPRINTLN("Attempting Magiquest decode");
+//     if (decodeMagiQuest(results, offset)) return true;
+// #endif
   /* NOTE: Disabled due to poor quality.
 #if DECODE_SANYO
     // The Sanyo S866500B decoder is very poor quality & depricated.
@@ -814,377 +814,377 @@ bool IRrecv::decode(decode_results *results, irparams_t *save,
       return true;
     }
 #endif
-#if DECODE_LASERTAG
-    DPRINTLN("Attempting Lasertag decode");
-    if (decodeLasertag(results, offset)) return true;
-#endif
-#if DECODE_GREE
-    // Gree based-devices use a similar code to Kelvinator ones, to avoid false
-    // matches this needs to happen after decodeKelvinator().
-    DPRINTLN("Attempting Gree decode");
-    if (decodeGree(results, offset)) return true;
-#endif
-#if DECODE_HAIER_AC
-    DPRINTLN("Attempting Haier AC decode");
-    if (decodeHaierAC(results, offset)) return true;
-#endif
-#if DECODE_HAIER_AC_YRW02
-    DPRINTLN("Attempting Haier AC YR-W02 decode");
-    if (decodeHaierACYRW02(results, offset)) return true;
-#endif
-#if DECODE_HAIER_AC176
-    DPRINTLN("Attempting Haier AC 176 bit decode");
-    if (decodeHaierAC176(results, offset)) return true;
-#endif  // DECODE_HAIER_AC176
-#if DECODE_HITACHI_AC424
-    // HitachiAc424 should be checked before HitachiAC, HitachiAC2,
-    // & HitachiAC184
-    DPRINTLN("Attempting Hitachi AC 424 decode");
-    if (decodeHitachiAc424(results, offset, kHitachiAc424Bits)) return true;
-#endif  // DECODE_HITACHI_AC424
-#if DECODE_MITSUBISHI136
-    // Needs to happen before HitachiAc3 decode.
-    DPRINTLN("Attempting Mitsubishi136 decode");
-    if (decodeMitsubishi136(results, offset)) return true;
-#endif  // DECODE_MITSUBISHI136
-#if DECODE_HITACHI_AC3
-    // HitachiAc3 should be checked before HitachiAC & HitachiAC2
-    // Attempt normal before the short version.
-    DPRINTLN("Attempting Hitachi AC3 decode");
-    // Order these in decreasing bit size, as it is more optimal.
-    if (decodeHitachiAc3(results, offset, kHitachiAc3Bits) ||
-        decodeHitachiAc3(results, offset, kHitachiAc3Bits - 4 * 8) ||
-        decodeHitachiAc3(results, offset, kHitachiAc3Bits - 6 * 8) ||
-        decodeHitachiAc3(results, offset, kHitachiAc3MinBits + 2 * 8) ||
-        decodeHitachiAc3(results, offset, kHitachiAc3MinBits))
-      return true;
-#endif  // DECODE_HITACHI_AC3
-#if DECODE_HITACHI_AC344
-    // HitachiAC344 should be checked before HitachiAC
-    DPRINTLN("Attempting Hitachi AC344 decode");
-    if (decodeHitachiAC(results, offset, kHitachiAc344Bits, true, false))
-      return true;
-#endif  // DECODE_HITACHI_AC344
-#if DECODE_HITACHI_AC264
-    // HitachiAC264 should be checked before HitachiAC
-    DPRINTLN("Attempting Hitachi AC264 decode");
-    if (decodeHitachiAC(results, offset, kHitachiAc264Bits, true, false))
-      return true;
-#endif  // DECODE_HITACHI_AC264
-#if DECODE_HITACHI_AC296
-    // HitachiAC296 should be checked before HitachiAC
-    DPRINTLN("Attempting Hitachi AC296 decode");
-    if (decodeHitachiAc296(results, offset, kHitachiAc296Bits, true))
-      return true;
-#endif  // DECODE_HITACHI_AC296
-#if DECODE_HITACHI_AC2
-    // HitachiAC2 should be checked before HitachiAC
-    DPRINTLN("Attempting Hitachi AC2 decode");
-    if (decodeHitachiAC(results, offset, kHitachiAc2Bits)) return true;
-#endif  // DECODE_HITACHI_AC2
-#if DECODE_HITACHI_AC
-    DPRINTLN("Attempting Hitachi AC decode");
-    if (decodeHitachiAC(results, offset, kHitachiAcBits)) return true;
-#endif
-#if DECODE_HITACHI_AC1
-    DPRINTLN("Attempting Hitachi AC1 decode");
-    if (decodeHitachiAC(results, offset, kHitachiAc1Bits)) return true;
-#endif
-#if DECODE_WHIRLPOOL_AC
-    DPRINTLN("Attempting Whirlpool AC decode");
-    if (decodeWhirlpoolAC(results, offset)) return true;
-#endif
-#if DECODE_SAMSUNG_AC
-    DPRINTLN("Attempting Samsung AC (extended) decode");
-    // Check the extended size first, as it should fail fast due to longer
-    // length.
-    if (decodeSamsungAC(results, offset, kSamsungAcExtendedBits)) return true;
-    // Now check for the more common length.
-    DPRINTLN("Attempting Samsung AC decode");
-    if (decodeSamsungAC(results, offset, kSamsungAcBits)) return true;
-#endif
-#if DECODE_ELECTRA_AC
-    DPRINTLN("Attempting Electra AC decode");
-    if (decodeElectraAC(results, offset)) return true;
-#endif
-#if DECODE_PANASONIC_AC
-    DPRINTLN("Attempting Panasonic AC decode");
-    if (decodePanasonicAC(results, offset)) return true;
-    DPRINTLN("Attempting Panasonic AC short decode");
-    if (decodePanasonicAC(results, offset, kPanasonicAcShortBits)) return true;
-#endif
-#if DECODE_LUTRON
-    DPRINTLN("Attempting Lutron decode");
-    if (decodeLutron(results, offset)) return true;
-#endif
-#if DECODE_MWM
-    DPRINTLN("Attempting MWM decode");
-    if (decodeMWM(results, offset)) return true;
-#endif
-#if DECODE_VESTEL_AC
-    DPRINTLN("Attempting Vestel AC decode");
-    if (decodeVestelAc(results, offset)) return true;
-#endif
-#if DECODE_MITSUBISHI112 || DECODE_TCL112AC
-    // Mitsubish112 and Tcl112 share the same decoder.
-    DPRINTLN("Attempting Mitsubishi112/TCL112AC decode");
-    if (decodeMitsubishi112(results, offset)) return true;
-#endif  // DECODE_MITSUBISHI112 || DECODE_TCL112AC
-#if DECODE_TECO
-    DPRINTLN("Attempting Teco decode");
-    if (decodeTeco(results, offset)) return true;
-#endif
-#if DECODE_LEGOPF
-    DPRINTLN("Attempting LEGOPF decode");
-    if (decodeLegoPf(results, offset)) return true;
-#endif
-#if DECODE_MITSUBISHIHEAVY
-    DPRINTLN("Attempting MITSUBISHIHEAVY (152 bit) decode");
-    if (decodeMitsubishiHeavy(results, offset, kMitsubishiHeavy152Bits))
-      return true;
-    DPRINTLN("Attempting MITSUBISHIHEAVY (88 bit) decode");
-    if (decodeMitsubishiHeavy(results, offset, kMitsubishiHeavy88Bits))
-      return true;
-#endif
-#if DECODE_ARGO
-  DPRINTLN("Attempting Argo WREM3 decode (AC Control)");
-  if (decodeArgoWREM3(results, offset, kArgo3AcControlStateLength * 8, true))
-    return true;
-  DPRINTLN("Attempting Argo WREM3 decode (iFeel report)");
-  if (decodeArgoWREM3(results, offset, kArgo3iFeelReportStateLength * 8, true))
-    return true;
-  DPRINTLN("Attempting Argo WREM3 decode (Config)");
-  if (decodeArgoWREM3(results, offset, kArgo3ConfigStateLength * 8, true))
-    return true;
-  DPRINTLN("Attempting Argo WREM3 decode (Timer)");
-  if (decodeArgoWREM3(results, offset, kArgo3TimerStateLength * 8, true))
-    return true;
-  DPRINTLN("Attempting Argo WREM2 decode");
-    if (decodeArgo(results, offset, kArgoBits) ||
-        decodeArgo(results, offset, kArgoShortBits, false)) return true;
-#endif  // DECODE_ARGO
-#if DECODE_SHARP_AC
-    DPRINTLN("Attempting SHARP_AC decode");
-    if (decodeSharpAc(results, offset)) return true;
-#endif
-#if DECODE_GOODWEATHER
-    DPRINTLN("Attempting GOODWEATHER decode");
-    if (decodeGoodweather(results, offset)) return true;
-#endif  // DECODE_GOODWEATHER
-#if DECODE_INAX
-    DPRINTLN("Attempting Inax decode");
-    if (decodeInax(results, offset)) return true;
-#endif  // DECODE_INAX
-#if DECODE_TROTEC
-    DPRINTLN("Attempting Trotec decode");
-    if (decodeTrotec(results, offset)) return true;
-#endif  // DECODE_TROTEC
-#if DECODE_TROTEC_3550
-    DPRINTLN("Attempting Trotec 3550 decode");
-    if (decodeTrotec3550(results, offset)) return true;
-#endif  // DECODE_TROTEC_3550
-#if DECODE_DAIKIN160
-    DPRINTLN("Attempting Daikin160 decode");
-    if (decodeDaikin160(results, offset)) return true;
-#endif  // DECODE_DAIKIN160
-#if DECODE_NEOCLIMA
-    DPRINTLN("Attempting Neoclima decode");
-    if (decodeNeoclima(results, offset)) return true;
-#endif  // DECODE_NEOCLIMA
-#if DECODE_DAIKIN176
-    DPRINTLN("Attempting Daikin176 decode");
-    if (decodeDaikin176(results, offset)) return true;
-#endif  // DECODE_DAIKIN176
-#if DECODE_DAIKIN128
-    DPRINTLN("Attempting Daikin128 decode");
-    if (decodeDaikin128(results, offset)) return true;
-#endif  // DECODE_DAIKIN128
-#if DECODE_AMCOR
-    DPRINTLN("Attempting Amcor decode");
-    if (decodeAmcor(results, offset)) return true;
-#endif  // DECODE_AMCOR
-#if DECODE_DAIKIN152
-    DPRINTLN("Attempting Daikin152 decode");
-    if (decodeDaikin152(results, offset)) return true;
-#endif  // DECODE_DAIKIN152
-#if DECODE_SYMPHONY
-    DPRINTLN("Attempting Symphony decode");
-    if (decodeSymphony(results, offset)) return true;
-#endif  // DECODE_SYMPHONY
-#if DECODE_DAIKIN64
-    DPRINTLN("Attempting Daikin64 decode");
-    if (decodeDaikin64(results, offset)) return true;
-#endif  // DECODE_DAIKIN64
-#if DECODE_AIRWELL
-    DPRINTLN("Attempting Airwell decode");
-    if (decodeAirwell(results, offset)) return true;
-#endif  // DECODE_AIRWELL
-#if DECODE_DELONGHI_AC
-    DPRINTLN("Attempting Delonghi AC decode");
-    if (decodeDelonghiAc(results, offset)) return true;
-#endif  // DECODE_DELONGHI_AC
-#if DECODE_DOSHISHA
-    DPRINTLN("Attempting Doshisha decode");
-    if (decodeDoshisha(results, offset)) return true;
-#endif  // DECODE_DOSHISHA
-#if DECODE_TRUMA
-    // Needs to happen before decodeMultibrackets() as they can appear similar.
-    DPRINTLN("Attempting Truma decode");
-    if (decodeTruma(results, offset)) return true;
-#endif  // DECODE_TRUMA
-#if DECODE_MULTIBRACKETS
-    DPRINTLN("Attempting Multibrackets decode");
-    if (decodeMultibrackets(results, offset)) return true;
-#endif  // DECODE_MULTIBRACKETS
-#if DECODE_CARRIER_AC40
-    DPRINTLN("Attempting Carrier 40bit decode");
-    if (decodeCarrierAC40(results, offset)) return true;
-#endif  // DECODE_CARRIER_AC40
-#if DECODE_CARRIER_AC64
-    DPRINTLN("Attempting Carrier 64bit decode");
-    if (decodeCarrierAC64(results, offset)) return true;
-#endif  // DECODE_CARRIER_AC64
-#if DECODE_TECHNIBEL_AC
-    DPRINTLN("Attempting Technibel AC decode");
-    if (decodeTechnibelAc(results, offset)) return true;
-#endif  // DECODE_TECHNIBEL_AC
-#if DECODE_CORONA_AC
-    DPRINTLN("Attempting CoronaAc decode");
-    if (decodeCoronaAc(results, offset)) return true;
-#endif  // DECODE_CORONA_AC
-#if DECODE_MIDEA24
-    DPRINTLN("Attempting Midea-Nec decode");
-    if (decodeMidea24(results, offset)) return true;
-#endif  // DECODE_MIDEA24
-#if DECODE_ZEPEAL
-    DPRINTLN("Attempting Zepeal decode");
-    if (decodeZepeal(results, offset)) return true;
-#endif  // DECODE_ZEPEAL
-#if DECODE_SANYO_AC
-    DPRINTLN("Attempting Sanyo AC decode");
-    if (decodeSanyoAc(results, offset)) return true;
-#endif  // DECODE_SANYO_AC
-#if DECODE_VOLTAS
-  DPRINTLN("Attempting Voltas decode");
-  if (decodeVoltas(results)) return true;
-#endif  // DECODE_VOLTAS
-#if DECODE_METZ
-    DPRINTLN("Attempting Metz decode");
-    if (decodeMetz(results, offset)) return true;
-#endif  // DECODE_METZ
-#if DECODE_TRANSCOLD
-    DPRINTLN("Attempting Transcold decode");
-    if (decodeTranscold(results, offset)) return true;
-#endif  // DECODE_TRANSCOLD
-#if DECODE_MIRAGE
-    DPRINTLN("Attempting Mirage decode");
-    if (decodeMirage(results, offset)) return true;
-#endif  // DECODE_MIRAGE
-#if DECODE_ELITESCREENS
-    DPRINTLN("Attempting EliteScreens decode");
-    if (decodeElitescreens(results, offset)) return true;
-#endif  // DECODE_ELITESCREENS
-#if DECODE_PANASONIC_AC32
-    DPRINTLN("Attempting Panasonic AC (32bit) long decode");
-    if (decodePanasonicAC32(results, offset, kPanasonicAc32Bits)) return true;
-    DPRINTLN("Attempting Panasonic AC (32bit) short decode");
-    if (decodePanasonicAC32(results, offset, kPanasonicAc32Bits / 2))
-      return true;
-#endif  // DECODE_PANASONIC_AC32
-#if DECODE_ECOCLIM
-    DPRINTLN("Attempting Ecoclim decode");
-    if (decodeEcoclim(results, offset, kEcoclimBits) ||
-        decodeEcoclim(results, offset, kEcoclimShortBits)) return true;
-#endif  // DECODE_ECOCLIM
-#if DECODE_XMP
-    DPRINTLN("Attempting XMP decode");
-    if (decodeXmp(results, offset, kXmpBits)) return true;
-#endif  // DECODE_XMP
-#if DECODE_TEKNOPOINT
-    DPRINTLN("Attempting Teknopoint decode");
-    if (decodeTeknopoint(results, offset)) return true;
-#endif  // DECODE_TEKNOPOINT
-#if DECODE_KELON168
-    DPRINTLN("Attempting Kelon 168-bit decode");
-    if (decodeKelon168(results, offset)) return true;
-#endif  // DECODE_KELON168
-#if DECODE_KELON
-    DPRINTLN("Attempting Kelon 48-bit decode");
-    if (decodeKelon(results, offset)) return true;
-#endif  // DECODE_KELON
-#if DECODE_SANYO_AC88
-    DPRINTLN("Attempting SanyoAc88 decode");
-    if (decodeSanyoAc88(results, offset)) return true;
-#endif  // DECODE_SANYO_AC88
-#if DECODE_BOSE
-    DPRINTLN("Attempting Bose decode");
-    if (decodeBose(results, offset)) return true;
-#endif  // DECODE_BOSE
-#if DECODE_ARRIS
-    DPRINTLN("Attempting Arris decode");
-    if (decodeArris(results, offset)) return true;
-#endif  // DECODE_ARRIS
+// #if DECODE_LASERTAG
+//     DPRINTLN("Attempting Lasertag decode");
+//     if (decodeLasertag(results, offset)) return true;
+// #endif
+// #if DECODE_GREE
+//     // Gree based-devices use a similar code to Kelvinator ones, to avoid false
+//     // matches this needs to happen after decodeKelvinator().
+//     DPRINTLN("Attempting Gree decode");
+//     if (decodeGree(results, offset)) return true;
+// #endif
+// #if DECODE_HAIER_AC
+//     DPRINTLN("Attempting Haier AC decode");
+//     if (decodeHaierAC(results, offset)) return true;
+// #endif
+// #if DECODE_HAIER_AC_YRW02
+//     DPRINTLN("Attempting Haier AC YR-W02 decode");
+//     if (decodeHaierACYRW02(results, offset)) return true;
+// #endif
+// #if DECODE_HAIER_AC176
+//     DPRINTLN("Attempting Haier AC 176 bit decode");
+//     if (decodeHaierAC176(results, offset)) return true;
+// #endif  // DECODE_HAIER_AC176
+// #if DECODE_HITACHI_AC424
+//     // HitachiAc424 should be checked before HitachiAC, HitachiAC2,
+//     // & HitachiAC184
+//     DPRINTLN("Attempting Hitachi AC 424 decode");
+//     if (decodeHitachiAc424(results, offset, kHitachiAc424Bits)) return true;
+// #endif  // DECODE_HITACHI_AC424
+// #if DECODE_MITSUBISHI136
+//     // Needs to happen before HitachiAc3 decode.
+//     DPRINTLN("Attempting Mitsubishi136 decode");
+//     if (decodeMitsubishi136(results, offset)) return true;
+// #endif  // DECODE_MITSUBISHI136
+// #if DECODE_HITACHI_AC3
+//     // HitachiAc3 should be checked before HitachiAC & HitachiAC2
+//     // Attempt normal before the short version.
+//     DPRINTLN("Attempting Hitachi AC3 decode");
+//     // Order these in decreasing bit size, as it is more optimal.
+//     if (decodeHitachiAc3(results, offset, kHitachiAc3Bits) ||
+//         decodeHitachiAc3(results, offset, kHitachiAc3Bits - 4 * 8) ||
+//         decodeHitachiAc3(results, offset, kHitachiAc3Bits - 6 * 8) ||
+//         decodeHitachiAc3(results, offset, kHitachiAc3MinBits + 2 * 8) ||
+//         decodeHitachiAc3(results, offset, kHitachiAc3MinBits))
+//       return true;
+// #endif  // DECODE_HITACHI_AC3
+// #if DECODE_HITACHI_AC344
+//     // HitachiAC344 should be checked before HitachiAC
+//     DPRINTLN("Attempting Hitachi AC344 decode");
+//     if (decodeHitachiAC(results, offset, kHitachiAc344Bits, true, false))
+//       return true;
+// #endif  // DECODE_HITACHI_AC344
+// #if DECODE_HITACHI_AC264
+//     // HitachiAC264 should be checked before HitachiAC
+//     DPRINTLN("Attempting Hitachi AC264 decode");
+//     if (decodeHitachiAC(results, offset, kHitachiAc264Bits, true, false))
+//       return true;
+// #endif  // DECODE_HITACHI_AC264
+// #if DECODE_HITACHI_AC296
+//     // HitachiAC296 should be checked before HitachiAC
+//     DPRINTLN("Attempting Hitachi AC296 decode");
+//     if (decodeHitachiAc296(results, offset, kHitachiAc296Bits, true))
+//       return true;
+// #endif  // DECODE_HITACHI_AC296
+// #if DECODE_HITACHI_AC2
+//     // HitachiAC2 should be checked before HitachiAC
+//     DPRINTLN("Attempting Hitachi AC2 decode");
+//     if (decodeHitachiAC(results, offset, kHitachiAc2Bits)) return true;
+// #endif  // DECODE_HITACHI_AC2
+// #if DECODE_HITACHI_AC
+//     DPRINTLN("Attempting Hitachi AC decode");
+//     if (decodeHitachiAC(results, offset, kHitachiAcBits)) return true;
+// #endif
+// #if DECODE_HITACHI_AC1
+//     DPRINTLN("Attempting Hitachi AC1 decode");
+//     if (decodeHitachiAC(results, offset, kHitachiAc1Bits)) return true;
+// #endif
+// #if DECODE_WHIRLPOOL_AC
+//     DPRINTLN("Attempting Whirlpool AC decode");
+//     if (decodeWhirlpoolAC(results, offset)) return true;
+// #endif
+// #if DECODE_SAMSUNG_AC
+//     DPRINTLN("Attempting Samsung AC (extended) decode");
+//     // Check the extended size first, as it should fail fast due to longer
+//     // length.
+//     if (decodeSamsungAC(results, offset, kSamsungAcExtendedBits)) return true;
+//     // Now check for the more common length.
+//     DPRINTLN("Attempting Samsung AC decode");
+//     if (decodeSamsungAC(results, offset, kSamsungAcBits)) return true;
+// #endif
+// #if DECODE_ELECTRA_AC
+//     DPRINTLN("Attempting Electra AC decode");
+//     if (decodeElectraAC(results, offset)) return true;
+// #endif
+// #if DECODE_PANASONIC_AC
+//     DPRINTLN("Attempting Panasonic AC decode");
+//     if (decodePanasonicAC(results, offset)) return true;
+//     DPRINTLN("Attempting Panasonic AC short decode");
+//     if (decodePanasonicAC(results, offset, kPanasonicAcShortBits)) return true;
+// #endif
+// #if DECODE_LUTRON
+//     DPRINTLN("Attempting Lutron decode");
+//     if (decodeLutron(results, offset)) return true;
+// #endif
+// #if DECODE_MWM
+//     DPRINTLN("Attempting MWM decode");
+//     if (decodeMWM(results, offset)) return true;
+// #endif
+// #if DECODE_VESTEL_AC
+//     DPRINTLN("Attempting Vestel AC decode");
+//     if (decodeVestelAc(results, offset)) return true;
+// #endif
+// #if DECODE_MITSUBISHI112 || DECODE_TCL112AC
+//     // Mitsubish112 and Tcl112 share the same decoder.
+//     DPRINTLN("Attempting Mitsubishi112/TCL112AC decode");
+//     if (decodeMitsubishi112(results, offset)) return true;
+// #endif  // DECODE_MITSUBISHI112 || DECODE_TCL112AC
+// #if DECODE_TECO
+//     DPRINTLN("Attempting Teco decode");
+//     if (decodeTeco(results, offset)) return true;
+// #endif
+// #if DECODE_LEGOPF
+//     DPRINTLN("Attempting LEGOPF decode");
+//     if (decodeLegoPf(results, offset)) return true;
+// #endif
+// #if DECODE_MITSUBISHIHEAVY
+//     DPRINTLN("Attempting MITSUBISHIHEAVY (152 bit) decode");
+//     if (decodeMitsubishiHeavy(results, offset, kMitsubishiHeavy152Bits))
+//       return true;
+//     DPRINTLN("Attempting MITSUBISHIHEAVY (88 bit) decode");
+//     if (decodeMitsubishiHeavy(results, offset, kMitsubishiHeavy88Bits))
+//       return true;
+// #endif
+// #if DECODE_ARGO
+//   DPRINTLN("Attempting Argo WREM3 decode (AC Control)");
+//   if (decodeArgoWREM3(results, offset, kArgo3AcControlStateLength * 8, true))
+//     return true;
+//   DPRINTLN("Attempting Argo WREM3 decode (iFeel report)");
+//   if (decodeArgoWREM3(results, offset, kArgo3iFeelReportStateLength * 8, true))
+//     return true;
+//   DPRINTLN("Attempting Argo WREM3 decode (Config)");
+//   if (decodeArgoWREM3(results, offset, kArgo3ConfigStateLength * 8, true))
+//     return true;
+//   DPRINTLN("Attempting Argo WREM3 decode (Timer)");
+//   if (decodeArgoWREM3(results, offset, kArgo3TimerStateLength * 8, true))
+//     return true;
+//   DPRINTLN("Attempting Argo WREM2 decode");
+//     if (decodeArgo(results, offset, kArgoBits) ||
+//         decodeArgo(results, offset, kArgoShortBits, false)) return true;
+// #endif  // DECODE_ARGO
+// #if DECODE_SHARP_AC
+//     DPRINTLN("Attempting SHARP_AC decode");
+//     if (decodeSharpAc(results, offset)) return true;
+// #endif
+// #if DECODE_GOODWEATHER
+//     DPRINTLN("Attempting GOODWEATHER decode");
+//     if (decodeGoodweather(results, offset)) return true;
+// #endif  // DECODE_GOODWEATHER
+// #if DECODE_INAX
+//     DPRINTLN("Attempting Inax decode");
+//     if (decodeInax(results, offset)) return true;
+// #endif  // DECODE_INAX
+// #if DECODE_TROTEC
+//     DPRINTLN("Attempting Trotec decode");
+//     if (decodeTrotec(results, offset)) return true;
+// #endif  // DECODE_TROTEC
+// #if DECODE_TROTEC_3550
+//     DPRINTLN("Attempting Trotec 3550 decode");
+//     if (decodeTrotec3550(results, offset)) return true;
+// #endif  // DECODE_TROTEC_3550
+// #if DECODE_DAIKIN160
+//     DPRINTLN("Attempting Daikin160 decode");
+//     if (decodeDaikin160(results, offset)) return true;
+// #endif  // DECODE_DAIKIN160
+// #if DECODE_NEOCLIMA
+//     DPRINTLN("Attempting Neoclima decode");
+//     if (decodeNeoclima(results, offset)) return true;
+// #endif  // DECODE_NEOCLIMA
+// #if DECODE_DAIKIN176
+//     DPRINTLN("Attempting Daikin176 decode");
+//     if (decodeDaikin176(results, offset)) return true;
+// #endif  // DECODE_DAIKIN176
+// #if DECODE_DAIKIN128
+//     DPRINTLN("Attempting Daikin128 decode");
+//     if (decodeDaikin128(results, offset)) return true;
+// #endif  // DECODE_DAIKIN128
+// #if DECODE_AMCOR
+//     DPRINTLN("Attempting Amcor decode");
+//     if (decodeAmcor(results, offset)) return true;
+// #endif  // DECODE_AMCOR
+// #if DECODE_DAIKIN152
+//     DPRINTLN("Attempting Daikin152 decode");
+//     if (decodeDaikin152(results, offset)) return true;
+// #endif  // DECODE_DAIKIN152
+// #if DECODE_SYMPHONY
+//     DPRINTLN("Attempting Symphony decode");
+//     if (decodeSymphony(results, offset)) return true;
+// #endif  // DECODE_SYMPHONY
+// #if DECODE_DAIKIN64
+//     DPRINTLN("Attempting Daikin64 decode");
+//     if (decodeDaikin64(results, offset)) return true;
+// #endif  // DECODE_DAIKIN64
+// #if DECODE_AIRWELL
+//     DPRINTLN("Attempting Airwell decode");
+//     if (decodeAirwell(results, offset)) return true;
+// #endif  // DECODE_AIRWELL
+// #if DECODE_DELONGHI_AC
+//     DPRINTLN("Attempting Delonghi AC decode");
+//     if (decodeDelonghiAc(results, offset)) return true;
+// #endif  // DECODE_DELONGHI_AC
+// #if DECODE_DOSHISHA
+//     DPRINTLN("Attempting Doshisha decode");
+//     if (decodeDoshisha(results, offset)) return true;
+// #endif  // DECODE_DOSHISHA
+// #if DECODE_TRUMA
+//     // Needs to happen before decodeMultibrackets() as they can appear similar.
+//     DPRINTLN("Attempting Truma decode");
+//     if (decodeTruma(results, offset)) return true;
+// #endif  // DECODE_TRUMA
+// #if DECODE_MULTIBRACKETS
+//     DPRINTLN("Attempting Multibrackets decode");
+//     if (decodeMultibrackets(results, offset)) return true;
+// #endif  // DECODE_MULTIBRACKETS
+// #if DECODE_CARRIER_AC40
+//     DPRINTLN("Attempting Carrier 40bit decode");
+//     if (decodeCarrierAC40(results, offset)) return true;
+// #endif  // DECODE_CARRIER_AC40
+// #if DECODE_CARRIER_AC64
+//     DPRINTLN("Attempting Carrier 64bit decode");
+//     if (decodeCarrierAC64(results, offset)) return true;
+// #endif  // DECODE_CARRIER_AC64
+// #if DECODE_TECHNIBEL_AC
+//     DPRINTLN("Attempting Technibel AC decode");
+//     if (decodeTechnibelAc(results, offset)) return true;
+// #endif  // DECODE_TECHNIBEL_AC
+// #if DECODE_CORONA_AC
+//     DPRINTLN("Attempting CoronaAc decode");
+//     if (decodeCoronaAc(results, offset)) return true;
+// #endif  // DECODE_CORONA_AC
+// #if DECODE_MIDEA24
+//     DPRINTLN("Attempting Midea-Nec decode");
+//     if (decodeMidea24(results, offset)) return true;
+// #endif  // DECODE_MIDEA24
+// #if DECODE_ZEPEAL
+//     DPRINTLN("Attempting Zepeal decode");
+//     if (decodeZepeal(results, offset)) return true;
+// #endif  // DECODE_ZEPEAL
+// #if DECODE_SANYO_AC
+//     DPRINTLN("Attempting Sanyo AC decode");
+//     if (decodeSanyoAc(results, offset)) return true;
+// #endif  // DECODE_SANYO_AC
+// #if DECODE_VOLTAS
+//   DPRINTLN("Attempting Voltas decode");
+//   if (decodeVoltas(results)) return true;
+// #endif  // DECODE_VOLTAS
+// #if DECODE_METZ
+//     DPRINTLN("Attempting Metz decode");
+//     if (decodeMetz(results, offset)) return true;
+// #endif  // DECODE_METZ
+// #if DECODE_TRANSCOLD
+//     DPRINTLN("Attempting Transcold decode");
+//     if (decodeTranscold(results, offset)) return true;
+// #endif  // DECODE_TRANSCOLD
+// #if DECODE_MIRAGE
+//     DPRINTLN("Attempting Mirage decode");
+//     if (decodeMirage(results, offset)) return true;
+// #endif  // DECODE_MIRAGE
+// #if DECODE_ELITESCREENS
+//     DPRINTLN("Attempting EliteScreens decode");
+//     if (decodeElitescreens(results, offset)) return true;
+// #endif  // DECODE_ELITESCREENS
+// #if DECODE_PANASONIC_AC32
+//     DPRINTLN("Attempting Panasonic AC (32bit) long decode");
+//     if (decodePanasonicAC32(results, offset, kPanasonicAc32Bits)) return true;
+//     DPRINTLN("Attempting Panasonic AC (32bit) short decode");
+//     if (decodePanasonicAC32(results, offset, kPanasonicAc32Bits / 2))
+//       return true;
+// #endif  // DECODE_PANASONIC_AC32
+// #if DECODE_ECOCLIM
+//     DPRINTLN("Attempting Ecoclim decode");
+//     if (decodeEcoclim(results, offset, kEcoclimBits) ||
+//         decodeEcoclim(results, offset, kEcoclimShortBits)) return true;
+// #endif  // DECODE_ECOCLIM
+// #if DECODE_XMP
+//     DPRINTLN("Attempting XMP decode");
+//     if (decodeXmp(results, offset, kXmpBits)) return true;
+// #endif  // DECODE_XMP
+// #if DECODE_TEKNOPOINT
+//     DPRINTLN("Attempting Teknopoint decode");
+//     if (decodeTeknopoint(results, offset)) return true;
+// #endif  // DECODE_TEKNOPOINT
+// #if DECODE_KELON168
+//     DPRINTLN("Attempting Kelon 168-bit decode");
+//     if (decodeKelon168(results, offset)) return true;
+// #endif  // DECODE_KELON168
+// #if DECODE_KELON
+//     DPRINTLN("Attempting Kelon 48-bit decode");
+//     if (decodeKelon(results, offset)) return true;
+// #endif  // DECODE_KELON
+// #if DECODE_SANYO_AC88
+//     DPRINTLN("Attempting SanyoAc88 decode");
+//     if (decodeSanyoAc88(results, offset)) return true;
+// #endif  // DECODE_SANYO_AC88
+// #if DECODE_BOSE
+//     DPRINTLN("Attempting Bose decode");
+//     if (decodeBose(results, offset)) return true;
+// #endif  // DECODE_BOSE
+// #if DECODE_ARRIS
+//     DPRINTLN("Attempting Arris decode");
+//     if (decodeArris(results, offset)) return true;
+// #endif  // DECODE_ARRIS
 #if DECODE_RHOSS
     DPRINTLN("Attempting Rhoss decode");
     if (decodeRhoss(results, offset)) return true;
 #endif  // DECODE_RHOSS
-#if DECODE_AIRTON
-    DPRINTLN("Attempting Airton decode");
-    if (decodeAirton(results, offset)) return true;
-#endif  // DECODE_AIRTON
-#if DECODE_COOLIX48
-    DPRINTLN("Attempting Coolix 48-bit decode");
-    if (decodeCoolix48(results, offset)) return true;
-#endif  // DECODE_COOLIX48
-#if DECODE_DAIKIN200
-    DPRINTLN("Attempting Daikin 200-bit decode");
-    if (decodeDaikin200(results, offset)) return true;
-#endif  // DECODE_DAIKIN200
-#if DECODE_HAIER_AC160
-    DPRINTLN("Attempting Haier AC 160 bit decode");
-    if (decodeHaierAC160(results, offset)) return true;
-#endif  // DECODE_HAIER_AC160
-#if DECODE_CARRIER_AC128
-    DPRINTLN("Attempting Carrier AC 128-bit decode");
-    if (decodeCarrierAC128(results, offset)) return true;
-#endif  // DECODE_CARRIER_AC128
-#if DECODE_TOTO
-    DPRINTLN("Attempting Toto 48/24-bit decode");
-    if (decodeToto(results, offset, kTotoLongBits) ||  // Long needs to be first
-        decodeToto(results, offset, kTotoShortBits)) return true;
-#endif  // DECODE_TOTO
-#if DECODE_CLIMABUTLER
-    DPRINTLN("Attempting ClimaButler decode");
-    if (decodeClimaButler(results)) return true;
-#endif  // DECODE_CLIMABUTLER
-#if DECODE_TCL96AC
-    DPRINTLN("Attempting TCL AC 96-bit decode");
-    if (decodeTcl96Ac(results, offset)) return true;
-#endif  // DECODE_TCL96AC
-#if DECODE_SANYO_AC152
-    DPRINTLN("Attempting Sanyo AC 152-bit decode");
-    if (decodeSanyoAc152(results, offset)) return true;
-#endif  // DECODE_SANYO_AC152
-#if DECODE_DAIKIN312
-    DPRINTLN("Attempting Daikin 312-bit decode");
-    if (decodeDaikin312(results, offset)) return true;
-#endif  // DECODE_DAIKIN312
-#if DECODE_GORENJE
-    DPRINTLN("Attempting GORENJE decode");
-    if (decodeGorenje(results, offset)) return true;
-#endif  // DECODE_GORENJE
-#if DECODE_WOWWEE
-    DPRINTLN("Attempting WOWWEE decode");
-    if (decodeWowwee(results, offset)) return true;
-#endif  // DECODE_WOWWEE
-#if DECODE_CARRIER_AC84
-    DPRINTLN("Attempting Carrier A/C 84-bit decode");
-    if (decodeCarrierAC84(results, offset)) return true;
-#endif  // DECODE_CARRIER_AC84
-#if DECODE_YORK
-    DPRINTLN("Attempting York decode");
-    if (decodeYork(results, offset, kYorkBits)) return true;
-#endif  // DECODE_YORK
+// #if DECODE_AIRTON
+//     DPRINTLN("Attempting Airton decode");
+//     if (decodeAirton(results, offset)) return true;
+// #endif  // DECODE_AIRTON
+// #if DECODE_COOLIX48
+//     DPRINTLN("Attempting Coolix 48-bit decode");
+//     if (decodeCoolix48(results, offset)) return true;
+// #endif  // DECODE_COOLIX48
+// #if DECODE_DAIKIN200
+//     DPRINTLN("Attempting Daikin 200-bit decode");
+//     if (decodeDaikin200(results, offset)) return true;
+// #endif  // DECODE_DAIKIN200
+// #if DECODE_HAIER_AC160
+//     DPRINTLN("Attempting Haier AC 160 bit decode");
+//     if (decodeHaierAC160(results, offset)) return true;
+// #endif  // DECODE_HAIER_AC160
+// #if DECODE_CARRIER_AC128
+//     DPRINTLN("Attempting Carrier AC 128-bit decode");
+//     if (decodeCarrierAC128(results, offset)) return true;
+// #endif  // DECODE_CARRIER_AC128
+// #if DECODE_TOTO
+//     DPRINTLN("Attempting Toto 48/24-bit decode");
+//     if (decodeToto(results, offset, kTotoLongBits) ||  // Long needs to be first
+//         decodeToto(results, offset, kTotoShortBits)) return true;
+// #endif  // DECODE_TOTO
+// #if DECODE_CLIMABUTLER
+//     DPRINTLN("Attempting ClimaButler decode");
+//     if (decodeClimaButler(results)) return true;
+// #endif  // DECODE_CLIMABUTLER
+// #if DECODE_TCL96AC
+//     DPRINTLN("Attempting TCL AC 96-bit decode");
+//     if (decodeTcl96Ac(results, offset)) return true;
+// #endif  // DECODE_TCL96AC
+// #if DECODE_SANYO_AC152
+//     DPRINTLN("Attempting Sanyo AC 152-bit decode");
+//     if (decodeSanyoAc152(results, offset)) return true;
+// #endif  // DECODE_SANYO_AC152
+// #if DECODE_DAIKIN312
+//     DPRINTLN("Attempting Daikin 312-bit decode");
+//     if (decodeDaikin312(results, offset)) return true;
+// #endif  // DECODE_DAIKIN312
+// #if DECODE_GORENJE
+//     DPRINTLN("Attempting GORENJE decode");
+//     if (decodeGorenje(results, offset)) return true;
+// #endif  // DECODE_GORENJE
+// #if DECODE_WOWWEE
+//     DPRINTLN("Attempting WOWWEE decode");
+//     if (decodeWowwee(results, offset)) return true;
+// #endif  // DECODE_WOWWEE
+// #if DECODE_CARRIER_AC84
+//     DPRINTLN("Attempting Carrier A/C 84-bit decode");
+//     if (decodeCarrierAC84(results, offset)) return true;
+// #endif  // DECODE_CARRIER_AC84
+// #if DECODE_YORK
+//     DPRINTLN("Attempting York decode");
+//     if (decodeYork(results, offset, kYorkBits)) return true;
+// #endif  // DECODE_YORK
   // Typically new protocols are added above this line.
   }
 #if DECODE_HASH
