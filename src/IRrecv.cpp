@@ -248,6 +248,9 @@ static void USE_IRAM_ATTR gpio_intr() {
   // @see https://github.com/espressif/arduino-esp32/blob/6b0114366baf986c155e8173ab7c22bc0c5fcedc/cores/esp32/esp32-hal-timer.c#L176-L178
   timer->dev->config.alarm_en = 1;
 #else  // _ESP32_IRRECV_TIMER_HACK
+#if ESP_IDF_VERSION_MAJOR >= 5
+  timerAlarm(timer, 0, false, 0);
+#else
 #if ( defined(ESP_ARDUINO_VERSION_MAJOR) && (ESP_ARDUINO_VERSION_MAJOR >= 3) )
   timerWrite(timer, 0);
   timerStart(timer);
@@ -255,6 +258,7 @@ static void USE_IRAM_ATTR gpio_intr() {
   timerWrite(timer, 0);
   timerAlarmEnable(timer);
 #endif  // ESP_ARDUINO_VERSION_MAJOR >= 3
+#endif  // ESP_IDF_VERSION_MAJOR >= 5
 #endif  // _ESP32_IRRECV_TIMER_HACK
 #endif  // ESP32
 }
@@ -379,6 +383,10 @@ void IRrecv::enableIRIn(const bool pullup) {
   }
 #endif  // DEBUG
   assert(timer != NULL);  // Check we actually got the timer.
+#if ESP_IDF_VERSION_MAJOR >= 5
+  timerRestart(timer);
+  timerAlarm(timer, MS_TO_USEC(params.timeout), ONCE, 0);
+#else
 #if ( defined(ESP_ARDUINO_VERSION_MAJOR) && (ESP_ARDUINO_VERSION_MAJOR >= 3) )
   timerAttachInterrupt(timer, &read_timeout);
   timerAlarm(timer, MS_TO_USEC(params.timeout), ONCE, 0);
@@ -390,6 +398,7 @@ void IRrecv::enableIRIn(const bool pullup) {
   // See: https://github.com/espressif/arduino-esp32/blob/caef4006af491130136b219c1205bdcf8f08bf2b/cores/esp32/esp32-hal-timer.c#L224-L227
   timerAttachInterrupt(timer, &read_timeout, false);
 #endif  // ESP_ARDUINO_VERSION_MAJOR >= 3
+#endif  // ESP_IDF_VERSION_MAJOR >= 5
 #endif  // ESP32
 
   // Initialise state machine variables
@@ -416,6 +425,10 @@ void IRrecv::disableIRIn(void) {
 #endif  // ESP8266
 #if defined(ESP32)
   if (timer == NULL) { return; }  // Call only once (defensive)
+#if ESP_IDF_VERSION_MAJOR >= 5
+  timerDetachInterrupt(timer);
+  timerEnd(timer);
+#else
 #if ( defined(ESP_ARDUINO_VERSION_MAJOR) && (ESP_ARDUINO_VERSION_MAJOR >= 3) )
   timerDetachInterrupt(timer);
   timerEnd(timer);
@@ -424,6 +437,7 @@ void IRrecv::disableIRIn(void) {
   timerDetachInterrupt(timer);
   timerEnd(timer);
 #endif  // ESP_ARDUINO_VERSION_MAJOR >= 3
+#endif  // ESP_IDF_VERSION_MAJOR >= 5
   timer = NULL;  // Cleanup the ESP32 timeout timer.
 #endif  // ESP32
   detachInterrupt(params.recvpin);
@@ -450,11 +464,15 @@ void IRrecv::resume(void) {
   params.rawlen = 0;
   params.overflow = false;
 #if defined(ESP32)
+#if ESP_IDF_VERSION_MAJOR >= 5
+  timerEnd(timer);
+#else
 #if ( defined(ESP_ARDUINO_VERSION_MAJOR) && (ESP_ARDUINO_VERSION_MAJOR >= 3) )
   timerStop(timer);
 #else   // ESP_ARDUINO_VERSION_MAJOR >= 3
   timerAlarmDisable(timer);
 #endif  // ESP_ARDUINO_VERSION_MAJOR >= 3
+#endif  // //ESP_IDF_VERSION_MAJOR >= 5
   gpio_intr_enable((gpio_num_t)params.recvpin);
 #endif  // ESP32
 }
